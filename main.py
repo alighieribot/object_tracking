@@ -1,6 +1,8 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 mp_drawing = mp.solutions.drawing_utils
 mp_objectron = mp.solutions.objectron
@@ -40,7 +42,35 @@ with mp_objectron.Objectron(static_image_mode=True, max_num_objects=3, min_detec
         if cv2.waitKey(5) & 0xFF == 27:
             break
 
+    # trajectories
+    trajectories = []
+    if len(trajectories) <= idx:
+        trajectories.append([])
+    trajectories[idx].append(detected_object.translation)
+
+    for idx, trajectory in enumerate(trajectories):
+        trajectory = np.array(trajectory)
+
+        # 2D
+        plt.figure()
+        plt.plot(trajectory[:, 0], trajectory[:, 1])
+        plt.title(f'Trajetória do Objeto {idx + 1} (2D)')
+        plt.xlabel('x')
+        plt.ylabel('y')
+
+        # 3D
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot(trajectory[:, 0], trajectory[:, 1], trajectory[:, 2])
+        ax.set_title(f'Trajetória do Objeto {idx + 1} (3D)')
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('z')
+
+    plt.show(block=True)
+
     cap.release()
+
 
 
 
